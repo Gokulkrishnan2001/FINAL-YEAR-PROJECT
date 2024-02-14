@@ -18,22 +18,27 @@ body{
 
 .form{
     border-radius: 5px;
-    border-color: #f14e4e;
-    position: relative;
-    left: 10px;
+    border: none;
     padding-left: 10px;
 }
 
 .button{
-    position: relative;
-    left: 10px;
+    color: #f14e4e;
     font-size: 16px;
-    border-color: #f14e4e;
-    border-radius: 10px;
-    padding: 0px 10px 0px 10px;
-    background-color: #f14e4e;
-    color: #ECECEC;
+    border: none;
+    border-radius:  7px;
     font-weight: 600;
-    cursor: pointer;
-    box-shadow: #f14e4e 2px  2px 15px;
+    padding-left: 7px;
+    padding-right: 7px;
+}
+
+.con{
+    border-radius: 10px;
+    padding: 30px;
+    background-color: #f14e4e;
+}
+
+.heading{
+    font-weight: 600;
+    color: white;
 }
