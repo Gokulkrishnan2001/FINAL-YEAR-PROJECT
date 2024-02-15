@@ -59,7 +59,7 @@ def signin():
             user_info = auth.get_account_info(user['idToken'])
             # Extract username
             username = user_info['users'][0].get('displayName', "Admin")
-            
+            print(username)
             return render_template('dashboard.html', username=username)
         except Exception as e:
             error = "Authentication failed. Please check your email and password."
@@ -101,17 +101,20 @@ def logout():
 
 #------------------------------------------------Machine learning integration--------------------------------------
 
-# Specify the upload folder
-app.config['UPLOAD_FOLDER'] = 'uploads'
+# Specify the upload folder inside the static directory
+app.config['UPLOAD_FOLDER'] = os.path.join('static', 'uploads')
+
 # Specify the allowed extensions for file uploads
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 
 # Load the pre-trained model
 loaded_model = load_model(r'C:\Users\proma\Desktop\FINAL YEAR PROJECT\RESNET-50-v1(gokul).h5')
 
+# Function to check if the file has allowed extensions
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
+# Function for contrast stretching
 def contrast_stretching(img):
     if img.shape[-1] == 3:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -124,6 +127,7 @@ def contrast_stretching(img):
 
     return stretched_img
 
+# Function to preprocess the image
 def preprocess_image(img_path):
     img = cv2.imread(img_path)
 
@@ -139,23 +143,34 @@ def preprocess_image(img_path):
 
     return img
 
+# Function to predict the image
 def predict_image(model, preprocessed_image):
     predictions = model.predict(preprocessed_image)
     return predictions
 
+def clear_uploads_folder():
+    for filename in os.listdir(app.config['UPLOAD_FOLDER']):
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        try:
+            if os.path.isfile(file_path):
+                os.unlink(file_path)
+        except Exception as e:
+            print(f"Error deleting file: {e}")
+
 @app.route('/disease_prediction')
 def disease_prediction():
+    clear_uploads_folder()
     return render_template('disease_prediction.html') 
 
 @app.route('/predict', methods=['POST'])
 def predict():
     if 'file' not in request.files:
-        return "No file part"
+        return render_template('error.html',error = 'No file found')
 
     file = request.files['file']
 
     if file.filename == '':
-        return "No selected file"
+        return render_template('error.html',error = 'No file found')
 
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
@@ -167,7 +182,6 @@ def predict():
         if preprocessed_image is not None:
             predictions = loaded_model.predict(preprocessed_image)
             predicted_class = (predictions > 0.65).astype(int).flatten()[0]
-
 
             if predicted_class == 0:
                 xem = (predictions > 0.5).astype(int).flatten()[0]
