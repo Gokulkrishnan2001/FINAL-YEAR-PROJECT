@@ -99,6 +99,54 @@ def logout():
     # Redirect to the signin page
     return redirect(url_for('signin'))
 
+#-------------------------------------------------Livestock data page----------------------------------------------
+# Function to check if the cow ID already exists for the user
+def check_cow_id(user_id, cow_id):
+    livestock_data = db.child("users").child(user_id).child("livestock").get()
+    if livestock_data:
+        for cow in livestock_data.each():
+            if cow.val().get("cow_id") == cow_id:
+                return True  # Cow ID already exists for the user
+    return False  # Cow ID doesn't exist for the user
+
+# Route for adding livestock information
+@app.route('/livestock', methods=['GET', 'POST'])
+def livestock():
+    if 'user' not in session:
+        return redirect(url_for('signin'))  # Redirect to sign-in page if user is not authenticated
+
+    user_id = session['user']
+
+    if request.method == 'POST':
+        # Handle form submission
+        cow_id = request.form['cow_id']
+        breed = request.form['breed']
+        dob = request.form['dob']
+        avg_milk = request.form['avg_milk']
+        buying_price = request.form['buying_price']
+
+        # Check if the cow ID already exists for the user
+        existing_cows = db.child("users").child(user_id).child("livestock").get().val()
+        if existing_cows and any(cow['cow_id'] == cow_id for cow in existing_cows.values()):
+            return render_template('error.html', error="Cow ID already exists. Please choose a different ID.")
+
+        # Push livestock data to Firebase under the user's node
+        try:
+            db.child("users").child(user_id).child("livestock").push({
+                "cow_id": cow_id,
+                "breed": breed,
+                "dob": dob,
+                "avg_milk": avg_milk,
+                "buying_price": buying_price
+            })
+        except Exception as e:
+            return render_template('error.html', error=str(e))
+
+    # Fetch the keys (child paths) under the "livestock" node
+    livestock_data = db.child("users").child(user_id).child("livestock").order_by_child("cow_id").get().val()
+    return render_template('livestock.html', livestock_data=livestock_data)
+
+
 #------------------------------------------------Machine learning integration--------------------------------------
 
 # Specify the upload folder inside the static directory
@@ -218,5 +266,6 @@ if __name__ == '__main__':
     # Initialize Firebase app
     firebase = pyrebase.initialize_app(firebaseConfig)
     auth = firebase.auth()
+    db = firebase.database()  # Initialize the Firebase database
 
     app.run(debug=True)
