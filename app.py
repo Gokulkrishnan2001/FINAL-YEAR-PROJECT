@@ -146,6 +146,64 @@ def livestock():
     livestock_data = db.child("users").child(user_id).child("livestock").order_by_child("cow_id").get().val()
     return render_template('livestock.html', livestock_data=livestock_data)
 
+#-----------------------------------------------end of lives stock page-----------------------------------------
+
+#-----------------------------------------------Expenditure page------------------------------------------------
+
+@app.route('/expenditure', methods=['GET', 'POST'])
+def expenditure():
+    if 'user' not in session:
+        return redirect(url_for('signin'))  # Redirect to sign-in page if user is not authenticated
+
+    user_id = session['user']
+
+    if request.method == 'POST':
+        # Handle form submission
+        date = request.form['date']
+        category = request.form['category']
+        description = request.form['description']
+        amount = float(request.form['amount'])
+        payment_method = request.form['payment_method']
+        supplier = request.form['supplier']
+        invoice_number = request.form['invoice_number']
+
+        expenditure_data = {
+            "date": date,
+            "category": category,
+            "description": description,
+            "amount": amount,
+            "payment_method": payment_method,
+            "supplier": supplier,
+            "invoice_number": invoice_number,
+        }
+
+        # Store the expenditure data into Firebase under the user's node
+        try:
+            db.child("users").child(user_id).child("expenditure").push(expenditure_data)
+        except Exception as e:
+            return render_template('error.html', error=str(e))
+
+        # Redirect to a different URL after form submission to prevent resubmission
+        return redirect(url_for('expenditure'))
+
+    # Fetch expenditure data for the user
+    expenditures = db.child("users").child(user_id).child("expenditure").order_by_child("date").get().val()
+
+    # Convert the dictionary of expenditure data to a list of dictionaries
+    expenditure_list = []
+    if expenditures:
+        for key, value in expenditures.items():
+            value['key'] = key  # Include the key in each expenditure entry for identification
+            expenditure_list.append(value)
+
+    return render_template('expenditure.html', expenditures=expenditure_list)
+
+    # Fetch expenditure data for the user
+    #expenditure_data = db.child("users").child(user_id).child("expenditure").order_by_child("date").get().val()
+    #return render_template('expenditure.html')
+
+#---------------------------------------------end of Expenditure page--------------------------------------------
+
 
 #------------------------------------------------Machine learning integration--------------------------------------
 

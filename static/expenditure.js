@@ -4,13 +4,13 @@ function submitForm(event) {
     event.preventDefault();
 
     // Reset the form fields
-    document.getElementById("livestockForm").reset();
+    document.getElementById("expenditureForm").reset();
 }
 
 // Function to show entries for a specific page
 function showPage(pageNumber) {
-    const rows = document.querySelectorAll("#livestockTable tbody tr");
-    const itemsPerPage = 6;
+    const rows = document.querySelectorAll("#expenditureTable tbody tr");
+    const itemsPerPage = 5;
     const startIndex = (pageNumber - 1) * itemsPerPage;
     const endIndex = Math.min(startIndex + itemsPerPage, rows.length);
 
@@ -89,8 +89,8 @@ function setActivePage(pageNumber) {
 }
 
 // Calculate total number of pages based on number of rows
-const totalRows = document.querySelectorAll("#livestockTable tbody tr").length;
-const totalPages = Math.ceil(totalRows / 6);
+const totalRows = document.querySelectorAll("#expenditureTable tbody tr").length;
+const totalPages = Math.ceil(totalRows / 5);
 
 // Generate pagination buttons
 generatePaginationButtons(totalPages);
