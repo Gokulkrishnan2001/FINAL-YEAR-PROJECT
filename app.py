@@ -30,14 +30,13 @@ def signup():
         try:
             # Create user with email and password
             user = auth.create_user_with_email_and_password(email, password)
-            # Set display name for the user
-            auth.update_profile(user['idToken'], {'displayName': username})
-            
             session['user'] = user['localId']
+            # Update profile with display name
+            auth.update_profile(user['idToken'], {'displayName': username})
             return redirect(url_for('dashboard'))
         except Exception as e:
             error = "An error occurred while creating your account."
-            return render_template('error.html', error=error)
+            return redirect(url_for('dashboard'))
     return render_template('signup.html')
 
 
@@ -59,8 +58,12 @@ def signin():
             user_info = auth.get_account_info(user['idToken'])
             # Extract username
             username = user_info['users'][0].get('displayName', "Admin")
-            print(username)
-            return render_template('dashboard.html', username=username)
+
+            # Store the username in the session
+            session['username'] = username
+
+            # Redirect to the dashboard
+            return redirect(url_for('dashboard'))
         except Exception as e:
             error = "Authentication failed. Please check your email and password."
             return render_template('error.html', error=error)
@@ -86,7 +89,8 @@ def forgot_password():
 def dashboard():
     if 'user' in session:
         user_id = session['user']
-        return render_template('dashboard.html')
+        username = session.get('username', 'admin')
+        return render_template('dashboard.html',username = username)
     else:
         # If user is not in session, redirect to sign-in page
         return redirect(url_for('signin'))
@@ -116,7 +120,6 @@ def livestock():
         return redirect(url_for('signin'))  # Redirect to sign-in page if user is not authenticated
 
     user_id = session['user']
-
     if request.method == 'POST':
         # Handle form submission
         cow_id = request.form['cow_id']
@@ -146,10 +149,7 @@ def livestock():
     livestock_data = db.child("users").child(user_id).child("livestock").order_by_child("cow_id").get().val()
     return render_template('livestock.html', livestock_data=livestock_data)
 
-#-----------------------------------------------end of lives stock page-----------------------------------------
-
 #-----------------------------------------------Expenditure page------------------------------------------------
-
 @app.route('/expenditure', methods=['GET', 'POST'])
 def expenditure():
     if 'user' not in session:
@@ -192,7 +192,7 @@ def expenditure():
     # Convert the dictionary of expenditure data to a list of dictionaries
     expenditure_list = []
     if expenditures:
-        for key, value in expenditures.items():
+        for key, value in reversed(expenditures.items()):
             value['key'] = key  # Include the key in each expenditure entry for identification
             expenditure_list.append(value)
 
@@ -202,7 +202,46 @@ def expenditure():
     #expenditure_data = db.child("users").child(user_id).child("expenditure").order_by_child("date").get().val()
     #return render_template('expenditure.html')
 
-#---------------------------------------------end of Expenditure page--------------------------------------------
+#---------------------------------------------Income Page---------------------------------------------------------
+@app.route('/income', methods=['GET', 'POST'])
+def add_income():
+    if 'user' not in session:
+        return redirect(url_for('signin'))  # Redirect to sign-in page if user is not authenticated
+    
+    user_id = session['user']
+    
+    if request.method == 'POST':
+        date = request.form['date']
+        source = request.form['source']
+        description = request.form['description']
+        amount = float(request.form['amount'])
+        payment_method = request.form['payment_method']
+        
+        income_data = {
+            "date": date,
+            "source": source,
+            "description": description,
+            "amount": amount,
+            "payment_method": payment_method
+        }
+        
+        try:
+            db.child("users").child(user_id).child("income").push(income_data)
+        except Exception as e:
+            return render_template('error.html', error=str(e))
+        
+        # Redirect to prevent form resubmission
+        return redirect(url_for('add_income'))
+    
+    # Fetch income data for the user
+    income_data = db.child("users").child(user_id).child("income").order_by_child("date").get().val()
+    income_list = []  # Convert income data to a list for rendering
+    if income_data:
+        for key, value in reversed(income_data.items()):
+            value['key'] = key  # Include the key for identification if needed
+            income_list.append(value)
+    # Render the income.html template with income data
+    return render_template('income.html', income_data=income_list)
 
 
 #------------------------------------------------Machine learning integration--------------------------------------
@@ -304,7 +343,7 @@ def predict():
     else:
         return "File type not allowed"
 
-
+#-------------------------------------------------config-------------------------------------------------------
 if __name__ == '__main__':
 
     # Set the secret key for session management
