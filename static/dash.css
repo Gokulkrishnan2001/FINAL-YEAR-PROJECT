@@ -45,6 +45,12 @@ html{
     font-size: 14px;
 }
 
+.info1{
+    color: var(--color-info-dark);
+    font-weight: 400;
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
 body{
     width: 100vw;
     height: 100vh;

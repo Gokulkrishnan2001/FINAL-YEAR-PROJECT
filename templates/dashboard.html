@@ -102,20 +102,21 @@
         <!-- Main Content -->
         <main>
             <h1>Dashboard</h1>
+            <h3 class="info1">Track your monthly revenue here</h3>
             <!-- Analyses -->
             <div class="analyse">
                 <div class="sales">
                     <div class="status">
                         <div class="info">
-                            <h3>Weekly Income</h3>
-                            <h1>$65,024</h1>
+                            <h3>Income</h3>
+                            <h1>{{ total_income }}₹</h1>
                         </div>
                         <div class="progresss">
                             <svg>
                                 <circle cx="38" cy="38" r="36"></circle>
                             </svg>
                             <div class="percentage">
-                                <p>+81%</p>
+                                <p>{{ income_change }}%</p>
                             </div>
                         </div>
                     </div>
@@ -123,15 +124,15 @@
                 <div class="visits">
                     <div class="status">
                         <div class="info">
-                            <h3>Weekly Expenditure</h3>
-                            <h1>24,981</h1>
+                            <h3>Expenditure</h3>
+                            <h1>{{ total_expenditure }}₹</h1>
                         </div>
                         <div class="progresss">
                             <svg>
                                 <circle cx="38" cy="38" r="36"></circle>
                             </svg>
                             <div class="percentage">
-                                <p>-48%</p>
+                                <p>{{ expenditure_change }}%</p>
                             </div>
                         </div>
                     </div>
@@ -140,14 +141,14 @@
                     <div class="status">
                         <div class="info">
                             <h3>Profit</h3>
-                            <h1>14,147</h1>
+                            <h1>{{ profit }}₹</h1>
                         </div>
                         <div class="progresss">
                             <svg>
                                 <circle cx="38" cy="38" r="36"></circle>
                             </svg>
                             <div class="percentage">
-                                <p>+21%</p>
+                                <p>{{ profit_change }}%</p>
                             </div>
                         </div>
                     </div>
