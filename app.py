@@ -163,8 +163,40 @@ def dashboard():
 
         # Calculate percentage change in profit
         profit_change = round(((profit - prev_profit) / prev_profit) * 100, 1) if prev_total_income != 0 else 0
+
+        #------------------------------pie chart------------------------------------
         
-        return render_template('dashboard.html', username=username, total_expenditure=total_expenditure, total_income=total_income, income_change=income_change, expenditure_change=expenditure_change,profit = profit,profit_change = profit_change)
+        # Query Firebase to fetch expenditure data
+        expenditure_data = db.child("users").child(user_id).child("expenditure").get().val()
+
+        # Initialize dictionary to store total expenditure for each category
+        category_totals = {}
+
+    # Process the data to calculate total expenditure for each category
+        for key, item in expenditure_data.items():
+            category = item['category']
+            amount = float(item['amount'])
+            if category in category_totals:
+                category_totals[category] += amount
+            else:
+                category_totals[category] = amount
+
+        # Convert the data into lists for rendering in the template
+        category_labels = list(category_totals.keys())
+        category_amounts = list(category_totals.values())
+            
+        return render_template(
+            'dashboard.html', 
+                           username=username, 
+                           total_expenditure=total_expenditure, 
+                           total_income=total_income, 
+                           income_change=income_change, 
+                           expenditure_change=expenditure_change, 
+                           profit=profit, 
+                           profit_change=profit_change,
+                           category_labels=category_labels,
+                           category_amounts=category_amounts
+        )
     else:
         # If user is not in session, redirect to sign-in page
         return redirect(url_for('signin'))

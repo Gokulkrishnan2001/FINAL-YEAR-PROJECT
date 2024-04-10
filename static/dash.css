@@ -602,6 +602,20 @@ main .recent-orders a{
 
 }
 
+#expenditureChart{
+    position: relative;
+    top: 50px;
+}
+
+.expenditure_heading{
+    position: relative;
+    top: 50px;
+    bottom: 20px;
+    padding: 10px;
+    color: var(--color-dark);
+    font-size: 24px;
+    font-weight:500 ;
+}
 @media screen and (max-width: 768px) {
     .container{
         width: 100%;

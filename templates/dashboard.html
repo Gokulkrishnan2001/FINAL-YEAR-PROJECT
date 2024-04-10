@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
     <link rel="stylesheet" href="/static/dash.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <title>Dashboard</title>
 </head>
 
@@ -203,77 +204,21 @@
 
             </div>
             <!-- End of Nav -->
-
-            <div class="user-profile">
+        <h2 class="expenditure_heading">Expenditure Chart</h2>
+        <canvas id="expenditureChart" width="400" height="400">Expenditure Chart</canvas> 
+        <script src="/static/dash2.js"></script>
+         <!--   <div class="user-profile">
                 <div class="logo">
                     <img src="static\images\logo.png">
                     <h2>C-Doc</h2>
                     <p>Lives stock management App</p>
                 </div>
-            </div>
-
-         <!--  <div class="reminders">
-                <div class="header">
-                    <h2>Reminders</h2>
-                    <span class="material-icons-sharp">
-                        notifications_none
-                    </span>
-                </div>
-
-                <div class="notification">
-                    <div class="icon">
-                        <span class="material-icons-sharp">
-                            volume_up
-                        </span>
-                    </div>
-                    <div class="content">
-                        <div class="info">
-                            <h3>Workshop</h3>
-                            <small class="text_muted">
-                                08:00 AM - 12:00 PM
-                            </small>
-                        </div>
-                        <span class="material-icons-sharp">
-                            more_vert
-                        </span>
-                    </div>
-                </div>
-
-                <div class="notification deactive">
-                    <div class="icon">
-                        <span class="material-icons-sharp">
-                            edit
-                        </span>
-                    </div>
-                    <div class="content">
-                        <div class="info">
-                            <h3>Workshop</h3>
-                            <small class="text_muted">
-                                08:00 AM - 12:00 PM
-                            </small>
-                        </div>
-                        <span class="material-icons-sharp">
-                            more_vert
-                        </span>
-                    </div>
-                </div>
-
-                <div class="notification add-reminder">
-                    <div>
-                        <span class="material-icons-sharp">
-                            add
-                        </span>
-                        <h3>Add Reminder</h3>
-                    </div>
-                </div>
-
-            </div>
-
-        </div> -->
-
-
+            </div> -->
     </div>
-    <script src="/static/dash.js"></script>
+    <script src="/static/dash.js">
+        var categoryLabels = JSON.parse('{{ category_labels | tojson | safe }}');
+        var categoryAmounts = JSON.parse('{{ category_amounts | tojson | safe }}');
+    </script>
 </body>
 
 </html>

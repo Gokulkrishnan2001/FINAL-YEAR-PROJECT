@@ -178,3 +178,20 @@ button.active-page {
     margin-top: 15px;
     margin-bottom: 10px;
 }
+
+.delete-btn {
+    height: 25px;
+    width: 50px;
+    background-color: var(--color-danger);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.delete-btn:hover {
+    background-color: #e6004c; /* Lighter shade of red on hover */
+}
+
+
+
