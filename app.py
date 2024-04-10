@@ -100,6 +100,7 @@ def dashboard():
         current_start_date = f"{current_year}-{current_month:02d}-01"
         current_end_date = f"{current_year}-{current_month:02d}-{monthrange(current_year, current_month)[1]}"
         
+
         # Calculate start and end dates of the previous month
         prev_month = current_month - 1 if current_month > 1 else 12
         prev_year = current_year if current_month > 1 else current_year - 1
@@ -109,7 +110,7 @@ def dashboard():
         # Query Firebase to fetch expenditures for the current month
         expenditures_ref = db.child("users").child(user_id).child("expenditure") \
             .order_by_child("date").start_at(current_start_date).end_at(current_end_date).get()
-        
+
         # Calculate total expenditure for the current month
         total_expenditure = 0
         if expenditures_ref:
@@ -127,6 +128,9 @@ def dashboard():
                 total_income += float(inc.val()['amount'])
         
         profit = total_income - total_expenditure
+
+        #print("*****************************************************************",total_income,total_expenditure,profit)
+
 
         # Query Firebase to fetch expenditures for the previous month
         prev_expenditures_ref = db.child("users").child(user_id).child("expenditure") \
@@ -324,7 +328,7 @@ app.config['UPLOAD_FOLDER'] = os.path.join('static', 'uploads')
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 
 # Load the pre-trained model
-loaded_model = load_model(r'C:\Users\proma\Desktop\FINAL YEAR PROJECT\RESNET-50-v1(gokul).h5')
+loaded_model = load_model(r'C:\Users\proma\Desktop\FINAL YEAR PROJECT\final_model.h5')
 
 # Function to check if the file has allowed extensions
 def allowed_file(filename):
@@ -364,29 +368,19 @@ def predict_image(model, preprocessed_image):
     predictions = model.predict(preprocessed_image)
     return predictions
 
-def clear_uploads_folder():
-    for filename in os.listdir(app.config['UPLOAD_FOLDER']):
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        try:
-            if os.path.isfile(file_path):
-                os.unlink(file_path)
-        except Exception as e:
-            print(f"Error deleting file: {e}")
-
 @app.route('/disease_prediction')
 def disease_prediction():
-    clear_uploads_folder()
     return render_template('disease_prediction.html') 
 
 @app.route('/predict', methods=['POST'])
 def predict():
     if 'file' not in request.files:
-        return render_template('error.html',error = 'No file found')
+        return render_template('error.html', error='No file found')
 
     file = request.files['file']
 
     if file.filename == '':
-        return render_template('error.html',error = 'No file found')
+        return render_template('error.html', error='No file found')
 
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
@@ -396,7 +390,7 @@ def predict():
         preprocessed_image = preprocess_image(file_path)
 
         if preprocessed_image is not None:
-            predictions = loaded_model.predict(preprocessed_image)
+            predictions = predict_image(loaded_model, preprocessed_image)
             predicted_class = (predictions > 0.65).astype(int).flatten()[0]
 
             if predicted_class == 0:
@@ -410,9 +404,9 @@ def predict():
 
             return render_template('prediction_result.html', prediction=prediction_result, image_url=image_url)
         else:
-            return "Error in image preprocessing."
+            return render_template('error.html', error="Error in image preprocessing.")
     else:
-        return "File type not allowed"
+        return render_template('error.html', error="File type not allowed")
 
 #-------------------------------------------------config-------------------------------------------------------
 if __name__ == '__main__':

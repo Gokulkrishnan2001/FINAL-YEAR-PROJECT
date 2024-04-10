@@ -232,7 +232,7 @@ main{
 }
 
 main .analyse {
-    display: grid;
+    display: block;
     grid-template-columns: repeat(3, 1fr);
     gap: 1.6rem;
     justify-items: stretch;
