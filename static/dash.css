@@ -232,7 +232,7 @@ main{
 }
 
 main .analyse {
-    display: block;
+    display: inline;
     grid-template-columns: repeat(3, 1fr);
     gap: 1.6rem;
     justify-items: stretch;
@@ -604,12 +604,11 @@ main .recent-orders a{
 
 #expenditureChart{
     position: relative;
-    top: 50px;
 }
 
 .expenditure_heading{
     position: relative;
-    top: 50px;
+    top: 10px;
     bottom: 20px;
     padding: 10px;
     color: var(--color-dark);
@@ -732,4 +731,36 @@ main .recent-orders a{
 /* --------------------------------------form imported---------------------------------- */
     
 
+}
+
+.chart {
+    padding: 15px;
+    position: relative;
+    top: 100px;
+    background-color: var(--color-white);
+    box-shadow: var(--box-shadow);
+    border-radius: var(--border-radius-2);
+}
+
+
+.income_chart{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding-top: 20px;
+    
+}
+
+.income_chart .h3{
+    color: var(--color-dark);
+    
+}
+
+#incomeChart{
+    position: relative;
+    top: 10px;
+    height: 350px;
+    background-color: var(--color-background);
+    box-shadow: var(--box-shadow);
+    border-radius: var(--border-radius-2);
 }

@@ -166,3 +166,35 @@ button{
 button.active-page {
     background-color: var(--color-success);
 }
+
+@media screen and (max-width: 768px)
+{
+    input[type="submit"] {
+        position: relative;
+        left: 75px;
+        height: 45px;
+        width: 270px;
+        padding: 0px 20px;
+        background-color: var(--color-success);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+}
+
+@media screen and (max-width: 1200px) {
+
+    input[type="submit"] {
+        position: relative;
+        left: 70px;
+        height: 45px;
+        width: 240px;
+        padding: 0px 20px;
+        background-color: var(--color-success);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+}

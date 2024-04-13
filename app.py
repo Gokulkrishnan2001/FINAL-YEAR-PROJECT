@@ -7,6 +7,8 @@ import tensorflow as tf
 from keras.models import load_model
 import pyrebase
 import json
+from calendar import monthrange
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
@@ -83,10 +85,63 @@ def forgot_password():
     # Render a simple form with an input field for email
     return render_template('Passreset.html')
 
-#-------------------------------------------------Dashboard page---------------------------------------------------
+#-------------------------------------------------Dashboard page--------------------------------------------------
 
-from datetime import datetime
-from calendar import monthrange
+def get_current_dates():
+    current_month = datetime.now().month
+    current_year = datetime.now().year
+    current_start_date = f"{current_year}-{current_month:02d}-01"
+    current_end_date = f"{current_year}-{current_month:02d}-{monthrange(current_year, current_month)[1]}"
+    
+    prev_month = current_month - 1 if current_month > 1 else 12
+    prev_year = current_year if current_month > 1 else current_year - 1
+    prev_start_date = f"{prev_year}-{prev_month:02d}-01"
+    prev_end_date = f"{prev_year}-{prev_month:02d}-{monthrange(prev_year, prev_month)[1]}"
+    
+    return current_start_date, current_end_date, prev_start_date, prev_end_date
+
+
+
+def calculate_total_amount(ref):
+    total = 0
+    if ref:
+        for item in ref.each():
+            total += float(item.val()['amount'])
+    return total
+
+
+def fetch_category_data(user_id):
+    expenditure_data = db.child("users").child(user_id).child("expenditure").get().val()
+    category_totals = {}
+    for key, item in expenditure_data.items():
+        category = item['category']
+        amount = float(item['amount'])
+        category_totals[category] = category_totals.get(category, 0) + amount
+
+    category_labels = list(category_totals.keys())
+    category_amounts = list(category_totals.values())
+    return category_labels, category_amounts
+
+def fetch_monthly_income_data(user_id, start_date, end_date):
+    incomes_ref = db.child("users").child(user_id).child("income") \
+        .order_by_child("date").start_at(start_date).end_at(end_date).get()
+    
+    monthly_income = {}
+    for item in incomes_ref.each():
+        date = item.val()['date']
+        amount = float(item.val()['amount'])
+        month_year = date[:7]  # Extracting YYYY-MM format
+        
+        if month_year in monthly_income:
+            monthly_income[month_year] += amount
+        else:
+            monthly_income[month_year] = amount
+            
+    # Sort the monthly income data by month_year
+    sorted_monthly_income = dict(sorted(monthly_income.items()))
+    
+    return list(sorted_monthly_income.keys()), list(sorted_monthly_income.values())
+
 
 @app.route('/dashboard')
 def dashboard():
@@ -183,8 +238,9 @@ def dashboard():
 
         # Convert the data into lists for rendering in the template
         category_labels = list(category_totals.keys())
-        category_amounts = list(category_totals.values())
-            
+        category_amounts = list(category_totals.values())     
+        
+          
         return render_template(
             'dashboard.html', 
                            username=username, 
@@ -195,13 +251,11 @@ def dashboard():
                            profit=profit, 
                            profit_change=profit_change,
                            category_labels=category_labels,
-                           category_amounts=category_amounts
+                           category_amounts=category_amounts,
         )
     else:
         # If user is not in session, redirect to sign-in page
         return redirect(url_for('signin'))
-
-
 #-------------------------------------------------logout page------------------------------------------------------
 @app.route('/logout')
 def logout():
