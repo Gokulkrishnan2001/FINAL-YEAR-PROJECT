@@ -1,4 +1,4 @@
-# 🐄 Cattle Management and Cow Lumpy Skin Disease Detection System
+# 🐄  C-Doc | Cattle Management and Cow Lumpy Skin Disease Detection System
 
 A web application designed to detect Cow Lumpy Skin Disease while also providing tools for managing cattle expenses. This project integrates machine learning and web development to support farmers in tracking financial data and monitoring cattle health.
 
